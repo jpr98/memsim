@@ -7,7 +7,13 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/jpr98/memsim/mem"
+
+	"github.com/jpr98/memsim/cpu"
 )
+
+var comp cpu.CPU
 
 func main() {
 	filename := flag.String("filename", "input.txt", "the name of the file to read instructions from")
@@ -20,6 +26,11 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(file)
+
+	comp = cpu.New(
+		mem.New(1204, 16),
+		mem.New(1204, 16),
+	)
 
 	for scanner.Scan() {
 		err := parseCommand(scanner.Text())
@@ -78,6 +89,10 @@ func handleProcess(cmd []string) {
 	pid := cmd[2]
 
 	fmt.Printf("Loading PID: %s size: %d\n", pid, size)
+	err := comp.CreateProcess(pid, size)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func handleAccess(cmd []string) {
@@ -86,6 +101,11 @@ func handleAccess(cmd []string) {
 	modify, _ := strconv.ParseBool(cmd[3]) //FIXME: Handle error
 
 	fmt.Printf("Accessing PID: %s address: %d modify: %t\n", pid, address, modify)
+	add, err := comp.AccessProcess(pid, address)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("found at real address %d\n", add)
 }
 
 func handleClear(cmd []string) {
