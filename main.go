@@ -28,8 +28,8 @@ func main() {
 	scanner := bufio.NewScanner(file)
 
 	comp = cpu.New(
-		mem.New(1204, 16),
-		mem.New(1204, 16),
+		mem.New(2048, 16),
+		mem.New(1024, 16),
 	)
 
 	for scanner.Scan() {

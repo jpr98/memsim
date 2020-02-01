@@ -22,10 +22,9 @@ func New(size, pageSize int) Memory {
 
 // AllocatePage ...
 func (m *Memory) AllocatePage(pid string, processPage int) bool {
-	for _, page := range m.pages {
-		if page.pid == "" {
-			page.pid = pid
-			page.virtualAddress = processPage
+	for i, p := range m.pages {
+		if p.pid == "" {
+			m.pages[i] = page{pid, processPage}
 			return true
 		}
 	}
@@ -33,9 +32,10 @@ func (m *Memory) AllocatePage(pid string, processPage int) bool {
 }
 
 // AccessPage ...
-func (m *Memory) AccessPage(pid string, address int) (int, bool) { // BUG: adjust address to range of page size in real addresses
+func (m *Memory) AccessPage(pid string, address int) (int, bool) {
+	displacedAddress := address / m.PageSize
 	for realAddress, page := range m.pages {
-		if page.pid == pid && page.virtualAddress == address {
+		if page.pid == pid && page.virtualAddress == displacedAddress {
 			return realAddress, true
 		}
 	}

@@ -32,11 +32,11 @@ func (c *CPU) CreateProcess(pid string, size int) error {
 }
 
 // AccessProcess ...
-func (c *CPU) AccessProcess(pid string, addr int) (*int, error) {
+func (c *CPU) AccessProcess(pid string, addr int) (int, error) {
 	rAddr, ok := c.realMemory.AccessPage(pid, addr)
 	if !ok {
-		return nil, fmt.Errorf("address %d for PID %s not found", addr, pid)
+		return -1, fmt.Errorf("address %d for PID %s not found", addr, pid)
 	}
 
-	return &rAddr, nil
+	return rAddr, nil
 }
