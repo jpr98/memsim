@@ -22,12 +22,17 @@ func New(real, swap mem.Memory) CPU {
 
 // CreateProcess ...
 func (c *CPU) CreateProcess(pid string, size int) error {
+	if size == 0 {
+		return fmt.Errorf("size should not be 0")
+	}
+
 	requiredPages := size / c.realMemory.PageSize
 	for i := 0; i < requiredPages; i++ {
 		if ok := c.realMemory.AllocatePage(pid, i); !ok {
 			return fmt.Errorf("not enough space in memory for PID: %s", pid)
 		}
 	}
+	// TODO: Check swap
 	return nil
 }
 
@@ -37,6 +42,18 @@ func (c *CPU) AccessProcess(pid string, addr int) (int, error) {
 	if !ok {
 		return -1, fmt.Errorf("address %d for PID %s not found", addr, pid)
 	}
-
+	// TODO: look for process in swap
 	return rAddr, nil
+}
+
+// DeleteProcess ...
+func (c *CPU) DeleteProcess(pid string) error {
+	foundInRealMem := c.realMemory.RemovePages(pid)
+
+	// TODO: delte process' pages from swap
+
+	if !foundInRealMem {
+		return fmt.Errorf("PID %s not found in memory", pid)
+	}
+	return nil
 }

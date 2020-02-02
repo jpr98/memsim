@@ -46,3 +46,15 @@ func (m *Memory) AccessPage(pid string, address int) (int, bool) {
 	}
 	return -1, false
 }
+
+// RemovePages ...
+func (m *Memory) RemovePages(pid string) bool {
+	found := false
+	for i, p := range m.pages {
+		if p.pid == pid {
+			m.pages[i] = page{}
+			found = true
+		}
+	}
+	return found
+}

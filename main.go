@@ -123,6 +123,10 @@ func handleClear(cmd []string) {
 	pid := cmd[1]
 
 	fmt.Printf("Clearing PID: %s\n", pid)
+	err := comp.DeleteProcess(pid)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func handleComment(cmd []string) {
