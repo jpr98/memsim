@@ -46,15 +46,28 @@ func TestAccessPage(t *testing.T) {
 	}
 
 	_ = memory.AllocatePage("1", 0)
-	ok = memory.AllocatePage("1", 1)
+	_ = memory.AllocatePage("1", 1)
+	addr, okay := memory.AccessPage("1", 1)
+	if !okay {
+		t.Error("AccessPage should return true if PID and virtual address exists in memory")
+	}
+	if addr != 0 {
+		t.Error("AccessPage should return correct real address")
+	}
+}
+
+func TestRemovePages(t *testing.T) {
+	memory, _ := mem.New(100, 10)
+	ok := memory.RemovePages("1")
 	if ok {
-		addr, okay := memory.AccessPage("1", 1)
-		if !okay {
-			t.Error("AccessPage should return true if PID and virtual address exists in memory")
-		}
-		if addr != 0 {
-			t.Error("AccessPage should return correct real address")
-		}
+		t.Error("RemovePages should return false if PID not present in memory")
 	}
 
+	_ = memory.AllocatePage("1", 1)
+	_ = memory.AllocatePage("1", 2)
+	ok = memory.RemovePages("1")
+	_, ok = memory.AccessPage("1", 2)
+	if ok {
+		t.Error("RemovePages should delete all pages with a given PID")
+	}
 }
