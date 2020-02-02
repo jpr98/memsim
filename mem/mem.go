@@ -1,5 +1,7 @@
 package mem
 
+import "errors"
+
 type page struct {
 	pid            string
 	virtualAddress int
@@ -12,12 +14,15 @@ type Memory struct {
 }
 
 // New creates a new Memory
-func New(size, pageSize int) Memory {
+func New(size, pageSize int) (*Memory, error) {
+	if pageSize == 0 {
+		return nil, errors.New("PageSize should not be zero")
+	}
 	numOfPages := size / pageSize
-	return Memory{
+	return &Memory{
 		pages:    make([]page, numOfPages),
 		PageSize: pageSize,
-	}
+	}, nil
 }
 
 // AllocatePage ...

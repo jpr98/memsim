@@ -27,9 +27,20 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
+	realMemory, err := mem.New(2048, 16)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Error creating real memory: %s", err.Error())
+		panic(errorMessage)
+	}
+
+	swapMemory, err := mem.New(2048, 16)
+	if err != nil {
+		errorMessage := fmt.Sprintf("Error creating swap memory: %s", err.Error())
+		panic(errorMessage)
+	}
 	comp = cpu.New(
-		mem.New(2048, 16),
-		mem.New(1024, 16),
+		*realMemory,
+		*swapMemory,
 	)
 
 	for scanner.Scan() {
