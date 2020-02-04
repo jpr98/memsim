@@ -8,19 +8,17 @@ import (
 
 // CPU ...
 type CPU struct {
-	realMemory mem.Memory
-	swapMemory mem.Memory
-	pids       set
+	mmu  mem.MMU
+	pids set
 }
 
 type set map[string]bool
 
 // New creates a new CPU
-func New(real, swap mem.Memory) CPU {
+func New(mmu mem.MMU) CPU {
 	return CPU{
-		realMemory: real,
-		swapMemory: swap,
-		pids:       make(map[string]bool),
+		mmu:  mmu,
+		pids: make(map[string]bool),
 	}
 }
 
@@ -35,14 +33,15 @@ func (c *CPU) CreateProcess(pid string, size int) error {
 		return fmt.Errorf("PID %s is already in cpu", pid)
 	}
 
-	requiredPages := size / c.realMemory.PageSize
+	requiredPages := size / c.mmu.PageSize
 	for i := 0; i < requiredPages; i++ {
-		if ok := c.realMemory.AllocatePage(pid, i); !ok {
-			return fmt.Errorf("not enough space in memory for PID: %s", pid)
+		err := c.mmu.AllocatePage(pid, i)
+		if err != nil {
+			return err
 		}
 	}
+
 	c.pids[pid] = true
-	// TODO: Check swap
 	return nil
 }
 
@@ -52,23 +51,20 @@ func (c *CPU) AccessProcess(pid string, addr int) (int, error) {
 		return -1, fmt.Errorf("PID %s is not present in cpu", pid)
 	}
 
-	rAddr, ok := c.realMemory.AccessPage(pid, addr)
-	if !ok {
-		return -1, fmt.Errorf("address %d for PID %s not found", addr, pid)
+	rAddr, err := c.mmu.AccessPage(pid, addr)
+	if err != nil {
+		return -1, err
 	}
-	// TODO: look for process in swap
+
 	return rAddr, nil
 }
 
 // DeleteProcess ...
 func (c *CPU) DeleteProcess(pid string) error {
-	foundInRealMem := c.realMemory.RemovePages(pid)
-
-	// TODO: delte process' pages from swap
-
-	if !foundInRealMem {
-		return fmt.Errorf("PID %s not found in memory", pid)
+	if !c.pids[pid] {
+		return fmt.Errorf("process with PID %s not found in memory", pid)
 	}
+	c.mmu.RemovePages(pid)
 	c.pids[pid] = false
 	return nil
 }

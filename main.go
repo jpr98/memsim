@@ -26,26 +26,16 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	realMemory, err := mem.New(2048, 16)
+	MMU, err := mem.NewMMU(2048, 4096, 16)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Error creating real memory: %s", err.Error())
-		panic(errorMessage)
+		panic(err)
 	}
-
-	swapMemory, err := mem.New(2048, 16)
-	if err != nil {
-		errorMessage := fmt.Sprintf("Error creating swap memory: %s", err.Error())
-		panic(errorMessage)
-	}
-	comp = cpu.New(
-		*realMemory,
-		*swapMemory,
-	)
+	comp = cpu.New(*MMU)
 
 	for scanner.Scan() {
 		err := parseCommand(scanner.Text())
 		if err != nil {
-			panic("received error")
+			panic(err)
 		}
 	}
 

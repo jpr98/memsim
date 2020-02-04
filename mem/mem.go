@@ -7,20 +7,37 @@ type page struct {
 	virtualAddress int
 }
 
-// Memory ...
-type Memory struct {
+type queue []page
+
+func (q *queue) push(p page) {
+	temp := append(*q, p)
+	q = &temp
+}
+
+func (q *queue) pop() (page, bool) {
+	if len(*q) < 1 {
+		return page{}, false
+	}
+	p := (*q)[0]
+	temp := (*q)[1:]
+	q = &temp
+	return p, true
+}
+
+type memory struct {
 	freeList []int
 	pages    []page
 	PageSize int
+	queue    []int
 }
 
-// New creates a new Memory
-func New(size, pageSize int) (*Memory, error) {
+// new creates a new Memory
+func new(size, pageSize int) (*memory, error) {
 	if pageSize == 0 {
 		return nil, errors.New("PageSize should not be zero")
 	}
 	numOfPages := size / pageSize
-	return &Memory{
+	return &memory{
 		freeList: createFreeList(numOfPages),
 		pages:    make([]page, numOfPages),
 		PageSize: pageSize,
@@ -35,7 +52,7 @@ func createFreeList(size int) []int {
 	return list
 }
 
-func (m *Memory) getNextFreeAddress() (int, bool) {
+func (m *memory) getNextFreeAddress() (int, bool) {
 	if len(m.freeList) < 1 {
 		return -1, false
 	}
@@ -44,41 +61,6 @@ func (m *Memory) getNextFreeAddress() (int, bool) {
 	return addr, true
 }
 
-// AllocatePage ...
-func (m *Memory) AllocatePage(pid string, processPage int) bool {
-	addr, ok := m.getNextFreeAddress()
-	if !ok {
-		return false
-	}
-
-	if m.pages[addr].pid != "" {
-		return false
-	}
-
-	m.pages[addr] = page{pid, processPage}
-	return true
-}
-
-// AccessPage ...
-func (m *Memory) AccessPage(pid string, address int) (int, bool) {
-	displacedAddress := address / m.PageSize
-	for realAddress, page := range m.pages {
-		if page.pid == pid && page.virtualAddress == displacedAddress {
-			return realAddress, true
-		}
-	}
-	return -1, false
-}
-
-// RemovePages ...
-func (m *Memory) RemovePages(pid string) bool {
-	found := false
-	for i, p := range m.pages {
-		if p.pid == pid {
-			m.pages[i] = page{}
-			found = true
-			m.freeList = append(m.freeList, i)
-		}
-	}
-	return found
+func (m *memory) freeAddress(i int) {
+	m.freeList = append(m.freeList, i)
 }
