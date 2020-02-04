@@ -61,7 +61,7 @@ func parseCommand(cmdStr string) error {
 		if len(cmd) != 3 {
 			return cmdArgsError("P", 3)
 		}
-		handleProcess(cmd)
+		handleCreateProcess(cmd)
 	case "A":
 		if len(cmd) != 4 {
 			return cmdArgsError("A", 4)
@@ -95,7 +95,7 @@ func parseCommand(cmdStr string) error {
 	return nil
 }
 
-func handleProcess(cmd []string) {
+func handleCreateProcess(cmd []string) {
 	size, _ := strconv.Atoi(cmd[1]) //FIXME: Handle error
 	pid := cmd[2]
 
