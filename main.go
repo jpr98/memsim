@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jpr98/memsim/mem"
-
 	"github.com/jpr98/memsim/cpu"
+	"github.com/jpr98/memsim/mem"
 )
 
 var comp cpu.CPU

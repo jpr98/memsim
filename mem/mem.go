@@ -12,7 +12,7 @@ type Memory struct {
 	freeList []int
 	pages    []page
 	PageSize int
-} // TODO: add set to keep existing PIDs
+}
 
 // New creates a new Memory
 func New(size, pageSize int) (*Memory, error) {
