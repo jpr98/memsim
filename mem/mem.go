@@ -20,7 +20,7 @@ type memory struct {
 // new creates a new Memory
 func new(size, pageSize int, policy *policy) (*memory, error) {
 	if pageSize == 0 {
-		return nil, errors.New("PageSize should not be zero")
+		return nil, errors.New("Page size should not be zero")
 	}
 	numOfPages := size / pageSize
 	return &memory{
