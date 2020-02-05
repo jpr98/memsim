@@ -16,6 +16,7 @@ var comp cpu.CPU
 
 func main() {
 	filename := flag.String("filename", "input.txt", "the name of the file to read instructions from")
+	debug := flag.Bool("debug", false, "debug mode, pass true to see memory allocation")
 	flag.Parse()
 
 	file, err := os.Open(*filename)
@@ -37,6 +38,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		comp.Print(*debug)
 	}
 
 	fmt.Println("Done!")

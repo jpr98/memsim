@@ -9,6 +9,7 @@ type Swap interface {
 	RetrievePage(string, int) (page, error)
 	StorePage(page) error
 	RemovePages(string)
+	GetPages() []page
 }
 
 // NewSwap creates a new Swap interface
@@ -24,7 +25,7 @@ func (m *memory) RetrievePage(pid string, address int) (page, error) {
 			return p, nil
 		}
 	}
-	return page{}, fmt.Errorf("page with virtual address %d for PID %s not found in swap", pid, address)
+	return page{}, fmt.Errorf("page with virtual address %d for PID %s not found in swap", address, pid)
 }
 
 func (m *memory) StorePage(p page) error {

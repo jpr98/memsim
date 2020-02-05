@@ -68,3 +68,10 @@ func (c *CPU) DeleteProcess(pid string) error {
 	c.pids[pid] = false
 	return nil
 }
+
+// Print prints the state of memory if in debug mode
+func (c *CPU) Print(debug bool) {
+	if debug {
+		c.mmu.Print()
+	}
+}

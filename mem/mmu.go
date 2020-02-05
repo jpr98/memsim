@@ -97,3 +97,20 @@ func (m *MMU) RemovePages(pid string) {
 	m.real.RemovePages(pid)
 	m.swap.RemovePages(pid)
 }
+
+// Print ...
+func (m *MMU) Print() {
+	pages := m.real.GetPages()
+	swappedPages := m.swap.GetPages()
+	fmt.Println("RAM\t\tSWAP")
+	for i := 0; i < len(swappedPages); i++ {
+		if len(pages) > i {
+			rp := pages[i]
+			fmt.Printf("%s\t%d\t", rp.pid, rp.virtualAddress)
+		} else {
+			fmt.Print("\t\t")
+		}
+		sp := swappedPages[i]
+		fmt.Printf("%s\t%d\n", sp.pid, sp.virtualAddress)
+	}
+}

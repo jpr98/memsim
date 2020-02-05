@@ -1,6 +1,8 @@
 package mem
 
-import "errors"
+import (
+	"errors"
+)
 
 type page struct {
 	pid            string
@@ -50,6 +52,10 @@ func createFreeList(size int) []int {
 		list[i] = i
 	}
 	return list
+}
+
+func (m *memory) GetPages() []page {
+	return m.pages
 }
 
 func (m *memory) getNextFreeAddress() (int, bool) {

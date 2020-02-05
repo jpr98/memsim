@@ -6,6 +6,7 @@ type Memory interface {
 	AccessPage(string, int) (int, bool)
 	RemovePages(string)
 	NextSwappingCandidate() (page, bool)
+	GetPages() []page
 }
 
 // NewMemory creates a new Memory interface
