@@ -3,6 +3,7 @@ package mem
 import (
 	"errors"
 	"fmt"
+	"io"
 )
 
 // MMU ...
@@ -104,18 +105,18 @@ func (m *MMU) RemovePages(pid string) {
 }
 
 // Print ...
-func (m *MMU) Print() {
+func (m *MMU) Print(w io.Writer) {
 	pages := m.real.GetPages()
 	swappedPages := m.swap.GetPages()
-	fmt.Println("RAM\t\tSWAP")
+	fmt.Fprintln(w, "RAM\t\tSWAP")
 	for i := 0; i < len(swappedPages); i++ {
 		if len(pages) > i {
 			rp := pages[i]
-			fmt.Printf("%s\t%d\t", rp.pid, rp.virtualAddress)
+			fmt.Fprintf(w, "%s\t%d\t", rp.pid, rp.virtualAddress)
 		} else {
-			fmt.Print("\t\t")
+			fmt.Fprint(w, "\t\t")
 		}
 		sp := swappedPages[i]
-		fmt.Printf("%s\t%d\n", sp.pid, sp.virtualAddress)
+		fmt.Fprintf(w, "%s\t%d\n", sp.pid, sp.virtualAddress)
 	}
 }

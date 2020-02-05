@@ -25,7 +25,7 @@ func (m *memory) RetrievePage(pid string, address int) (page, error) {
 			return p, nil
 		}
 	}
-	return page{}, fmt.Errorf("page with virtual address %d for PID %s not found in swap", address, pid)
+	return page{}, fmt.Errorf("page with virtual address %d for PID %s not found", address, pid)
 }
 
 func (m *memory) StorePage(p page) error {

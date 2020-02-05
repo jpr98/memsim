@@ -2,6 +2,7 @@ package cpu
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/jpr98/memsim/mem"
 )
@@ -69,8 +70,8 @@ func (c *CPU) DeleteProcess(pid string) error {
 }
 
 // Print prints the state of memory if in debug mode
-func (c *CPU) Print(debug bool) {
+func (c *CPU) Print(debug bool, w io.Writer) {
 	if debug {
-		c.mmu.Print()
+		c.mmu.Print(w)
 	}
 }

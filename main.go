@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -22,6 +23,7 @@ func main() {
 	debug := flag.Bool("debug", false, "debug mode, pass true to see memory allocation")
 	policy := flag.String("policy", "FIFO", "sets the replacement policy to be used when swapping pages")
 	breaking = flag.Bool("breaking", false, "*experimental* asks user to continue or quit execution if there is an error")
+	server := flag.Bool("server", false, "if true a server with live monitoring will start")
 	flag.Parse()
 
 	file, err := os.Open(*filename)
@@ -49,23 +51,39 @@ func main() {
 		fmt.Println("")
 	}
 
+	c := make(chan bool)
+	if *server {
+		go startServer(c)
+	}
+
 	reader = bufio.NewReader(os.Stdin)
 	for scanner.Scan() {
 		err := parseCommand(scanner.Text())
 		if err != nil {
-			fmt.Printf("Error parsing instruction: %s", scanner.Text())
+			fmt.Printf("Error parsing instruction: %s\n", scanner.Text())
 			if cont := askBreak(); cont {
 				continue
 			}
 		}
-		comp.Print(*debug)
+		comp.Print(*debug, os.Stdout)
 	}
 
 	fmt.Println("Done!")
+	if *server {
+		<-c
+	}
+}
+
+func startServer(c chan bool) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		comp.Print(true, w)
+	})
+
+	http.ListenAndServe(":8000", nil)
 }
 
 func parseCommand(cmdStr string) error {
-	cmd := strings.Split(cmdStr, " ")
+	cmd := strings.Fields(cmdStr)
 	start := time.Now()
 	switch cmd[0] {
 	case "P":
@@ -84,7 +102,6 @@ func parseCommand(cmdStr string) error {
 		}
 		handleClear(cmd)
 	case "C":
-		// TODO: this will be a comment, we need to join the words to form the sentence
 		if len(cmd) < 2 {
 			return cmdArgsError("C", 2)
 		}
@@ -187,7 +204,7 @@ func handleClear(cmd []string) {
 
 func handleComment(cmd []string) {
 	comment := strings.Join(cmd[1:], " ")
-	fmt.Printf("Comment %s\n", comment)
+	fmt.Printf("Comment: %s\n", comment)
 }
 
 func handleFinalize() {
