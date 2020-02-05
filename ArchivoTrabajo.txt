@@ -1,0 +1,28 @@
+C archivo de prueba para FIFO, LRU
+P 32 2             
+P 48 3             
+P 63 4             
+L 3                   
+P 80 5             
+P 1744 109    
+P 96 6
+A  16 2 0            
+A   63 4  0          
+A   62     4    1  
+A   1    109   1  
+C 
+P 96 61                                                                                                            
+L 2                    
+A 8 5 0
+A 8 4 0                 
+L 5
+L 2                    
+L 4              
+L 6                    
+L 61                  
+L 109
+F
+A 2 2 0                
+P 2049 2049            
+F
+E

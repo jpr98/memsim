@@ -35,8 +35,6 @@ func main() {
 		return
 	}
 
-	scanner := bufio.NewScanner(file)
-
 	MMU, err := mem.NewMMU(2048, 4096, 16, *policy)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -57,6 +55,7 @@ func main() {
 	}
 
 	reader = bufio.NewReader(os.Stdin)
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		err := parseCommand(scanner.Text())
 		if err != nil {

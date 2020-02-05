@@ -37,6 +37,9 @@ func (m *memory) AccessPage(pid string, address int) (int, bool) {
 	displacedAddress := address / m.PageSize
 	for realAddress, page := range m.pages {
 		if page.pid == pid && page.virtualAddress == displacedAddress {
+			if m.policy.LRU {
+				// incrementar
+			}
 			return realAddress, true
 		}
 	}
@@ -68,6 +71,9 @@ func (m *memory) NextSwappingCandidate() (page, bool) {
 
 			return p, true
 		}
+	} else if m.policy.LRU {
+		// iterar por arreglo y sacar el más grande
+		// quitar del arreglo
 	}
 
 	return page{}, false
