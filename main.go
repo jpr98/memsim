@@ -34,6 +34,7 @@ func main() {
 		os.Exit(1)
 		return
 	}
+	defer file.Close()
 
 	MMU, err := mem.NewMMU(2048, 4096, 16, *policy)
 	if err != nil {
