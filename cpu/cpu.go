@@ -18,7 +18,7 @@ type set map[string]bool
 func New(mmu mem.MMU) CPU {
 	return CPU{
 		mmu:  mmu,
-		pids: make(map[string]bool),
+		pids: make(set),
 	}
 }
 
@@ -28,8 +28,7 @@ func (c *CPU) CreateProcess(pid string, size int) error {
 		return fmt.Errorf("size should not be 0")
 	}
 
-	present := c.pids[pid]
-	if present {
+	if c.pids[pid] {
 		return fmt.Errorf("PID %s is already in cpu", pid)
 	}
 
@@ -47,7 +46,7 @@ func (c *CPU) CreateProcess(pid string, size int) error {
 
 // AccessProcess ...
 func (c *CPU) AccessProcess(pid string, addr int) (int, error) {
-	if present := c.pids[pid]; !present {
+	if !c.pids[pid] {
 		return -1, fmt.Errorf("PID %s is not present in cpu", pid)
 	}
 
