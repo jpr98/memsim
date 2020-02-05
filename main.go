@@ -17,6 +17,7 @@ var comp cpu.CPU
 func main() {
 	filename := flag.String("filename", "input.txt", "the name of the file to read instructions from")
 	debug := flag.Bool("debug", false, "debug mode, pass true to see memory allocation")
+	policy := flag.String("policy", "fifo", "sets the replacement policy to be used when swapping pages")
 	flag.Parse()
 
 	file, err := os.Open(*filename)
@@ -27,7 +28,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	MMU, err := mem.NewMMU(2048, 4096, 16)
+	MMU, err := mem.NewMMU(2048, 4096, 16, *policy)
 	if err != nil {
 		panic(err)
 	}

@@ -14,7 +14,7 @@ type Swap interface {
 
 // NewSwap creates a new Swap interface
 func NewSwap(size, pageSize int) (Swap, error) {
-	return new(size, pageSize)
+	return new(size, pageSize, nil)
 }
 
 func (m *memory) RetrievePage(pid string, address int) (page, error) {

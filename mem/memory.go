@@ -10,8 +10,8 @@ type Memory interface {
 }
 
 // NewMemory creates a new Memory interface
-func NewMemory(size, pageSize int) (Memory, error) {
-	return new(size, pageSize)
+func NewMemory(size, pageSize int, policy policy) (Memory, error) {
+	return new(size, pageSize, &policy)
 }
 
 // AllocatePage ...
@@ -26,7 +26,9 @@ func (m *memory) AllocatePage(pid string, processPage int) bool {
 	}
 
 	m.pages[addr] = page{pid, processPage}
-	m.queue = append(m.queue, addr)
+	if m.policy.FIFO {
+		m.queue = append(m.queue, addr)
+	}
 	return true
 }
 
@@ -53,18 +55,20 @@ func (m *memory) RemovePages(pid string) {
 
 // NextSwappingCandidate ...
 func (m *memory) NextSwappingCandidate() (page, bool) {
-	// FIFO
-	if len(m.queue) > 0 {
-		// get next from queue
-		candidateAddress := m.queue[0]
-		m.queue = m.queue[1:]
+	if m.policy.FIFO {
+		if len(m.queue) > 0 {
+			// get next from queue
+			candidateAddress := m.queue[0]
+			m.queue = m.queue[1:]
 
-		// retrieve page for candidate address
-		p := m.pages[candidateAddress]
-		m.pages[candidateAddress] = page{}
-		m.freeAddress(candidateAddress)
+			// retrieve page for candidate address
+			p := m.pages[candidateAddress]
+			m.pages[candidateAddress] = page{}
+			m.freeAddress(candidateAddress)
 
-		return p, true
+			return p, true
+		}
 	}
+
 	return page{}, false
 }

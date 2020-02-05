@@ -9,32 +9,16 @@ type page struct {
 	virtualAddress int
 }
 
-type queue []page
-
-func (q *queue) push(p page) {
-	temp := append(*q, p)
-	q = &temp
-}
-
-func (q *queue) pop() (page, bool) {
-	if len(*q) < 1 {
-		return page{}, false
-	}
-	p := (*q)[0]
-	temp := (*q)[1:]
-	q = &temp
-	return p, true
-}
-
 type memory struct {
 	freeList []int
 	pages    []page
 	PageSize int
 	queue    []int
+	policy   *policy
 }
 
 // new creates a new Memory
-func new(size, pageSize int) (*memory, error) {
+func new(size, pageSize int, policy *policy) (*memory, error) {
 	if pageSize == 0 {
 		return nil, errors.New("PageSize should not be zero")
 	}
@@ -43,6 +27,7 @@ func new(size, pageSize int) (*memory, error) {
 		freeList: createFreeList(numOfPages),
 		pages:    make([]page, numOfPages),
 		PageSize: pageSize,
+		policy:   policy,
 	}, nil
 }
 

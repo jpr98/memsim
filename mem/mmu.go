@@ -13,8 +13,13 @@ type MMU struct {
 }
 
 // NewMMU creates a new Memory Management Unit
-func NewMMU(memSize, swapSize, pageSize int) (*MMU, error) {
-	real, err := NewMemory(memSize, pageSize)
+func NewMMU(memSize, swapSize, pageSize int, policyStr string) (*MMU, error) {
+	p, err := createPolicy(policyStr)
+	if err != nil {
+		return nil, err
+	}
+
+	real, err := NewMemory(memSize, pageSize, p)
 	if err != nil {
 		return nil, err
 	}
