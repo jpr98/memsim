@@ -26,6 +26,7 @@ func (m *memory) AllocatePage(pid string, processPage int) bool {
 	}
 
 	m.pages[addr] = page{pid, processPage}
+	m.queue = append(m.queue, addr)
 	return true
 }
 
@@ -34,7 +35,6 @@ func (m *memory) AccessPage(pid string, address int) (int, bool) {
 	displacedAddress := address / m.PageSize
 	for realAddress, page := range m.pages {
 		if page.pid == pid && page.virtualAddress == displacedAddress {
-			m.queue = append(m.queue, realAddress)
 			return realAddress, true
 		}
 	}

@@ -33,7 +33,7 @@ func (c *CPU) CreateProcess(pid string, size int) error {
 		return fmt.Errorf("PID %s is already in cpu", pid)
 	}
 
-	requiredPages := size / c.mmu.PageSize
+	requiredPages := size / c.mmu.PageSize // FIXME: round up
 	for i := 0; i < requiredPages; i++ {
 		err := c.mmu.AllocatePage(pid, i)
 		if err != nil {
