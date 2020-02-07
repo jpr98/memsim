@@ -34,12 +34,19 @@ func (m *memory) AllocatePage(pid string, processPage int) bool {
 
 // AccessPage ...
 func (m *memory) AccessPage(pid string, address int) (int, bool) {
-	displacedAddress := address / m.PageSize
-	for realAddress, page := range m.pages {
-		if page.pid == pid && page.virtualAddress == displacedAddress {
+	pageNumber := address / m.PageSize
+	displacement := address % m.PageSize
+	if displacement == 0 && address != 0 {
+		pageNumber--
+		displacement = m.PageSize
+	}
+
+	for _, page := range m.pages {
+		if page.pid == pid && page.virtualAddress == pageNumber {
 			if m.policy.LRU {
 				// incrementar
 			}
+			realAddress := page.virtualAddress*m.PageSize + displacement
 			return realAddress, true
 		}
 	}
