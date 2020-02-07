@@ -3,6 +3,7 @@ package cpu
 import (
 	"fmt"
 	"io"
+	"math"
 
 	"github.com/jpr98/memsim/mem"
 )
@@ -33,7 +34,8 @@ func (c *CPU) CreateProcess(pid string, size int) error {
 		return fmt.Errorf("PID %s is already in cpu", pid)
 	}
 
-	requiredPages := size / c.mmu.PageSize // FIXME: round up
+	fRequiredPages := float64(size) / float64(c.mmu.PageSize)
+	requiredPages := int(math.Ceil(fRequiredPages))
 	for i := 0; i < requiredPages; i++ {
 		err := c.mmu.AllocatePage(pid, i)
 		if err != nil {
