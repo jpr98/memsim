@@ -11,6 +11,7 @@ type MMU struct {
 	real     Memory
 	swap     Swap
 	PageSize int
+	SCount   int // swap count
 }
 
 // NewMMU creates a new Memory Management Unit
@@ -34,6 +35,7 @@ func NewMMU(memSize, swapSize, pageSize int, policyStr string) (*MMU, error) {
 		real:     real,
 		swap:     swap,
 		PageSize: pageSize,
+		SCount:   0,
 	}, nil
 }
 
@@ -60,42 +62,46 @@ func (m *MMU) AllocatePage(pid string, processPage int) error {
 	if !ok {
 		return errors.New("Error allocating swapped-in page")
 	}
+
+	m.SCount++
 	return nil
 }
 
 // AccessPage ...
-func (m *MMU) AccessPage(pid string, address int) (int, error) {
+func (m *MMU) AccessPage(pid string, address int) (int, bool, error) {
 	if addr, ok := m.real.AccessPage(pid, address); ok {
-		return addr, nil
+		return addr, false, nil
 	}
 
 	// search for page in swap
 	swapInPage, err := m.swap.RetrievePage(pid, address)
 	if err != nil {
-		return -1, err
+		return 0, false, err
 	}
 
 	// if present, get pages that can be swapped
 	swapOutPage, ok := m.real.NextSwappingCandidate()
 	if !ok {
-		return -1, errors.New("No swapping candidate found")
+		return 0, false, errors.New("No swapping candidate found")
 	}
 
 	// exchange pages
 	err = m.swap.StorePage(swapOutPage)
 	if err != nil {
-		return -1, err
+		return 0, false, err
 	}
 	if ok := m.real.AllocatePage(swapInPage.pid, swapInPage.virtualAddress); !ok {
-		return -1, fmt.Errorf("Error allocating swapped-in page with PID %s", swapInPage.pid)
+		return 0, false, fmt.Errorf("Error allocating swapped-in page with PID %s", swapInPage.pid)
 	}
 
 	// get new address of desired page
 	addr, ok := m.real.AccessPage(pid, address)
 	if !ok {
-		return -1, fmt.Errorf("Error accessing page with PID %s", pid)
+		return 0, false, fmt.Errorf("Error accessing page with PID %s", pid)
 	}
-	return addr, nil
+
+	m.SCount++
+	return addr, true, nil
 }
 
 // RemovePages ...

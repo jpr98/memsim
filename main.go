@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/jpr98/memsim/cpu"
 	"github.com/jpr98/memsim/mem"
@@ -84,7 +83,7 @@ func startServer(c chan bool) {
 
 func parseCommand(cmdStr string) error {
 	cmd := strings.Fields(cmdStr)
-	start := time.Now()
+	//start := time.Now()
 	switch strings.ToUpper(cmd[0]) {
 	case "P":
 		if len(cmd) < 3 {
@@ -129,7 +128,7 @@ func parseCommand(cmdStr string) error {
 	default:
 		fmt.Println("Invalid command")
 	}
-	fmt.Println(time.Since(start))
+	//fmt.Println(time.Since(start))
 	return nil
 }
 
@@ -235,6 +234,7 @@ func handleComment(cmd []string) {
 
 func handleFinalize() {
 	fmt.Println("Finalized this sequence of instructions")
+	comp.ReportStats()
 	fmt.Println("Reseting system")
 	fmt.Println("----------------------------------------------------")
 }
