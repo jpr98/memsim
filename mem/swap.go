@@ -22,6 +22,7 @@ func (m *memory) RetrievePage(pid string, address int) (page, error) {
 	displacedAddress := address / m.PageSize
 	for i, p := range m.pages {
 		if p.pid == pid && p.virtualAddress == displacedAddress {
+			m.pages[i] = page{}
 			m.freeAddress(i)
 			return p, nil
 		}
