@@ -17,6 +17,7 @@ func NewSwap(size, pageSize int) (Swap, error) {
 	return new(size, pageSize, nil)
 }
 
+// RetrievePage looks for a given page on disk and returns it
 func (m *memory) RetrievePage(pid string, address int) (page, error) {
 	displacedAddress := address / m.PageSize
 	for i, p := range m.pages {
@@ -28,6 +29,7 @@ func (m *memory) RetrievePage(pid string, address int) (page, error) {
 	return page{}, fmt.Errorf("page with virtual address %d for PID %s not found", address, pid)
 }
 
+// StorePage gets a page and saves it on an available page frame on disk
 func (m *memory) StorePage(p page) error {
 	addr, ok := m.getNextFreeAddress()
 	if !ok {
