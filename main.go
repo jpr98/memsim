@@ -60,7 +60,7 @@ func main() {
 	for scanner.Scan() {
 		err := parseCommand(scanner.Text())
 		if err != nil {
-			fmt.Printf("Error parsing instruction: %s\n", scanner.Text())
+			fmt.Printf("Error parsing instruction: %s\n", err.Error())
 			if cont := askBreak(); cont {
 				continue
 			}
@@ -85,37 +85,47 @@ func startServer(c chan bool) {
 func parseCommand(cmdStr string) error {
 	cmd := strings.Fields(cmdStr)
 	start := time.Now()
-	switch cmd[0] {
+	switch strings.ToUpper(cmd[0]) {
 	case "P":
-		if len(cmd) != 3 {
+		if len(cmd) < 3 {
 			return cmdArgsError("P", 3)
 		}
 		handleCreateProcess(cmd)
 	case "A":
-		if len(cmd) != 4 {
+		if len(cmd) < 4 {
 			return cmdArgsError("A", 4)
 		}
 		handleAccess(cmd)
 	case "L":
-		if len(cmd) != 2 {
+		if len(cmd) < 2 {
 			return cmdArgsError("L", 2)
 		}
 		handleClear(cmd)
 	case "C":
-		if len(cmd) < 2 {
+		if len(cmd) < 1 {
 			return cmdArgsError("C", 2)
 		}
 		handleComment(cmd)
 	case "F":
 		if len(cmd) > 1 {
-			return cmdArgsError("F", 1)
+			if confirmIntention("Did you mean F (finalize)?") {
+				handleFinalize()
+			} else {
+				return cmdArgsError("F", 1)
+			}
+		} else {
+			handleFinalize()
 		}
-		handleFinalize()
 	case "E":
 		if len(cmd) > 1 {
-			return cmdArgsError("E", 1)
+			if confirmIntention("Did you mean E (end)?") {
+				handleEnd()
+			} else {
+				return cmdArgsError("E", 1)
+			}
+		} else {
+			handleEnd()
 		}
-		handleEnd()
 	default:
 		fmt.Println("Invalid command")
 	}
@@ -129,6 +139,7 @@ func askBreak() bool {
 		fmt.Print("Do you wish to continue with next instruction? [y/n] ")
 		resp, _ := reader.ReadString('\n')
 		resp = strings.ToLower(resp)
+		resp = strings.TrimSpace(resp)
 		if resp == "n" {
 			fmt.Println("Stopping execution")
 			os.Exit(1)
@@ -139,6 +150,17 @@ func askBreak() bool {
 	fmt.Println("Stopping execution")
 	os.Exit(1)
 	return false
+}
+
+func confirmIntention(message string) bool {
+	fmt.Printf("%s [y/n] ", message)
+	resp, _ := reader.ReadString('\n')
+	resp = strings.ToLower(resp)
+	resp = strings.TrimSpace(resp)
+	if resp == "n" {
+		return false
+	}
+	return true
 }
 
 func handleCreateProcess(cmd []string) {
@@ -203,6 +225,10 @@ func handleClear(cmd []string) {
 }
 
 func handleComment(cmd []string) {
+	if len(cmd) == 0 {
+		fmt.Println("")
+		return
+	}
 	comment := strings.Join(cmd[1:], " ")
 	fmt.Printf("Comment: %s\n", comment)
 }
