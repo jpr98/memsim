@@ -41,12 +41,12 @@ func (m *memory) AccessPage(pid string, address int) (int, bool) {
 		displacement = m.PageSize
 	}
 
-	for _, page := range m.pages {
+	for pageFrame, page := range m.pages {
 		if page.pid == pid && page.virtualAddress == pageNumber {
 			if m.policy.LRU {
 				// incrementar
 			}
-			realAddress := page.virtualAddress*m.PageSize + displacement
+			realAddress := pageFrame*m.PageSize + displacement
 			return realAddress, true
 		}
 	}
