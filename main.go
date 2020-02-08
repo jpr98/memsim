@@ -21,7 +21,7 @@ func main() {
 	filename := flag.String("filename", "input.txt", "the name of the file to read instructions from")
 	debug := flag.Bool("debug", false, "debug mode, pass true to see memory allocation")
 	policy := flag.String("policy", "FIFO", "sets the replacement policy to be used when swapping pages")
-	breaking = flag.Bool("breaking", false, "*experimental* asks user to continue or quit execution if there is an error")
+	breaking = flag.Bool("breaking", true, "*experimental* asks user to continue or quit execution if there is an error")
 	server := flag.Bool("server", false, "if true a server with live monitoring will start")
 	flag.Parse()
 

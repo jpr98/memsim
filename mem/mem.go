@@ -1,6 +1,7 @@
 package mem
 
 import (
+	"container/list"
 	"errors"
 )
 
@@ -15,6 +16,7 @@ type memory struct {
 	PageSize int
 	queue    []int
 	policy   *policy
+	lru      lruCache
 }
 
 // new creates a new Memory
@@ -28,6 +30,7 @@ func new(size, pageSize int, policy *policy) (*memory, error) {
 		pages:    make([]page, numOfPages),
 		PageSize: pageSize,
 		policy:   policy,
+		lru:      lruCache{list.New(), make(set)},
 	}, nil
 }
 

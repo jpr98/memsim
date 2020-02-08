@@ -28,6 +28,8 @@ func (m *memory) AllocatePage(pid string, processPage int) bool {
 	m.pages[addr] = page{pid, processPage}
 	if m.policy.FIFO {
 		m.queue = append(m.queue, addr)
+	} else if m.policy.LRU {
+		m.lru.Refer(addr)
 	}
 	return true
 }
@@ -45,7 +47,7 @@ func (m *memory) AccessPage(pid string, address int) (int, bool) {
 
 		if page.pid == pid && page.virtualAddress == pageNumber {
 			if m.policy.LRU {
-				// incrementar
+				m.lru.Refer(pageFrame)
 			}
 			realAddress := pageFrame*m.PageSize + displacement
 			return realAddress, true
@@ -80,8 +82,13 @@ func (m *memory) NextSwappingCandidate() (page, bool) {
 			return p, true
 		}
 	} else if m.policy.LRU {
-		// iterar por arreglo y sacar el más grande
-		// quitar del arreglo
+		candidateAddress := m.lru.GetNext()
+		p := m.pages[candidateAddress]
+
+		m.pages[candidateAddress] = page{}
+		m.freeAddress(candidateAddress)
+
+		return p, true
 	}
 
 	return page{}, false
