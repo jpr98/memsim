@@ -114,6 +114,7 @@ func (m *MMU) RemovePages(pid string) {
 func (m *MMU) Print(w io.Writer) {
 	pages := m.real.GetPages()
 	swappedPages := m.swap.GetPages()
+
 	fmt.Fprintln(w, "RAM\t\tSWAP")
 	for i := 0; i < len(swappedPages); i++ {
 		if len(pages) > i {
