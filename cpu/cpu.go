@@ -93,7 +93,6 @@ func (c *CPU) ReportStats() {
 	var accumTurnaround time.Duration
 
 	fmt.Println("\n** Stats **")
-	fmt.Println("(times in ms)")
 	// turnaround time per process
 	fmt.Println("\nTurnaround time")
 	for k, v := range c.pids {
@@ -103,14 +102,14 @@ func (c *CPU) ReportStats() {
 		}
 		turnaround := v.end.Sub(v.start)
 		accumTurnaround += turnaround
-		fmt.Printf("%d\n", turnaround.Microseconds())
+		fmt.Printf("%dms\n", turnaround.Microseconds())
 	}
 
 	// turnaround promedio
 	fmt.Println("\nAverage turnaround time")
 	processCount := len(c.pids)
 	avgTime := int(accumTurnaround) / processCount
-	fmt.Println(time.Duration(avgTime).Microseconds())
+	fmt.Printf("%dms\n", time.Duration(avgTime).Microseconds())
 
 	// page faults por proceso
 	fmt.Println("\nPage Faults per process")
